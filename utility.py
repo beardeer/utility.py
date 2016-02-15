@@ -1,11 +1,10 @@
 import csv
 import data_path
-from db_conn import db as assistments_db
 from datetime import datetime
 import numpy as np
 import matplotlib.mlab as mlab
 import matplotlib.pyplot as plt
-from sklearn.metrics import auc_score, roc_auc_score
+from sklearn.metrics import roc_auc_score
 from scipy import stats
 
 
@@ -136,6 +135,21 @@ class CsvProcessor(object):
         data_x, data_y = self.get_two_data_from_two_cols(col_x, col_y)
         auc = roc_auc_score(data_x, data_y)
         return auc
+
+class DataCache(object):
+
+	def __init__(self, func):
+		self.func = func
+		self.cache = {}
+
+	def get(self, arg_str):
+		if self.cache.has_key(arg_str):
+			return self.cache[arg_str]
+		else:
+			args = arg_str.split(',')
+			result = self.func(*args)
+			self.cache[arg_str] = result
+			return result
 
 
 if __name__ == "__main__":
