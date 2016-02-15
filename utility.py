@@ -67,17 +67,16 @@ class QueryProcessor(object):
         return [item.strip()
             for item in query.upper().split("FROM")[0].split("SELECT")[-1].split(",")]
 
-    def run_query(self, query, db=None):
-        if db == None:
-            db = assistments_db
+    def run_query(self, query, db):
         print query
         return db.bind.execute(query).fetchall()
 
-    def run_query_to_csv(self, query, db=None):
-        if db == None:
-            db = assistments_db
-        output_file_name = get_file_name_with_time(data_path.DROPBOX_DATA_FOLDER, "query_result_", ".csv")
-        output_file = open(output_file_name, "wb")
+    def run_query_to_csv(self, query, db, output_file_path = None):
+
+        if output_file_path == None:
+            output_file_path = get_file_name_with_time(data_path.DROPBOX_DATA_FOLDER, "query_result_", ".csv")
+            
+        output_file = open(output_file_path, "wb")
         csv_writer = csv.writer(output_file)
 
         header = self.get_header_from_query(query)
