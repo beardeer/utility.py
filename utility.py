@@ -60,35 +60,37 @@ def get_file_name_with_time(folder, file_name_prefix, file_name_extension):
 
 class QueryProcessor(object):
 
-    def __init__(self):
-        pass
+    def __init__(self, db_connection, output_folder):
+        self.db = db_connection
+        self.output_folder = output_folder
 
     def get_header_from_query(self, query):
         return [item.strip()
             for item in query.upper().split("FROM")[0].split("SELECT")[-1].split(",")]
 
-    def run_query(self, query, db):
+    def run_query(self, query):
         print query
-        return db.bind.execute(query).fetchall()
+        return self.db.bind.execute(query).fetchall()
 
-    def run_query_to_csv(self, query, db, output_file_path = None):
+    def run_query_to_csv(self, query, output_file_path = None):
 
         if output_file_path == None:
-            output_file_path = get_file_name_with_time(data_path.DROPBOX_DATA_FOLDER, "query_result_", ".csv")
-            
+            output_file_path = get_file_name_with_time(self.output_folder, "query_result_", ".csv")
+
         output_file = open(output_file_path, "wb")
         csv_writer = csv.writer(output_file)
 
         header = self.get_header_from_query(query)
         csv_writer.writerow(header)
 
-        result = self.run_query(query, db)
+        result = self.run_query(query)
         for item in result:
             row = [value for value in item]
             csv_writer.writerow(row)
 
         output_file.close()
         print output_file_name
+        return output_file_name
 
     def get_value_by_header(self, values, headers, header_name):
         pos = headers.index(header_name.upper())
@@ -109,12 +111,6 @@ class CsvProcessor(object):
 
             for row in csv_reader:
                 self.data.append(row)
-
-    def get_data_from_csv(self, file_name, has_header=True):
-        pass
-
-    def get_histogram_plot(self):
-        pass
 
     def get_two_data_from_two_cols(self, col_x, col_y):
         data_x = []
