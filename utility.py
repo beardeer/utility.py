@@ -1,4 +1,5 @@
 import csv
+import os
 import data_path
 from datetime import datetime
 import numpy as np
@@ -55,8 +56,10 @@ def build_dict_from_csv(csv_file_name, key_column=1, has_header=True, duplicated
     return data_dict
 
 def get_file_name_with_time(folder, file_name_prefix, file_name_extension):
-    return folder + file_name_prefix + \
-           datetime.now().strftime("%Y_%m_%d_%H_%M_%S") + file_name_extension
+    return os.path.join(folder, 
+    	file_name_prefix + datetime.now().strftime("%Y_%m_%d_%H_%M_%S") + \
+    	file_name_extension
+    	)
 
 class QueryProcessor(object):
 
@@ -69,7 +72,7 @@ class QueryProcessor(object):
             for item in query.upper().split("FROM")[0].split("SELECT")[-1].split(",")]
 
     def run_query(self, query):
-        print query
+        print "Running queries: ", query
         return self.db.bind.execute(query).fetchall()
 
     def run_query_to_csv(self, query, output_file_path = None):
@@ -89,8 +92,8 @@ class QueryProcessor(object):
             csv_writer.writerow(row)
 
         output_file.close()
-        print output_file_name
-        return output_file_name
+        print output_file_path
+        return output_file_path
 
     def get_value_by_header(self, values, headers, header_name):
         pos = headers.index(header_name.upper())
